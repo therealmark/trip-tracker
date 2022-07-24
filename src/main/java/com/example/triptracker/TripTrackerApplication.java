@@ -38,8 +38,10 @@ public class TripTrackerApplication implements CommandLineRunner {
         for (ChangeStreamDocument<Itinerary> itineraryChangeStreamDocument : changeStream) {
             Ticket ticket = new Ticket();
             ticket.setPnr(itineraryChangeStreamDocument.getFullDocument().getPassengerNameRecord());
+            Booking oldestBooking = itineraryChangeStreamDocument.getFullDocument().getBookings().stream().min(Comparator.comparing(Booking::getBookedOn)).get();
             Booking latestBooking = itineraryChangeStreamDocument.getFullDocument().getBookings().stream().max(Comparator.comparing(Booking::getBookedOn)).get();
-            ticket.setPrice(latestBooking.getPrice());
+            ticket.setOldestPrice(oldestBooking.getPrice());
+            ticket.setLatestPrice(latestBooking.getPrice());
             ticket.setBookedOnDate(latestBooking.getBookedOn());
             System.out.println(String.format("Updated %s", ticketService.upsertTicket(ticket)));
         }

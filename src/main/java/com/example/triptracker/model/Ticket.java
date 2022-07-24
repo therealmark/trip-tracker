@@ -16,6 +16,7 @@ import java.util.Date;
 public class Ticket {
     private ObjectId id;
     private String pnr;
-    private Integer price;
+    private Integer latestPrice;
+    private Integer oldestPrice;
     private Date bookedOnDate;
 }
