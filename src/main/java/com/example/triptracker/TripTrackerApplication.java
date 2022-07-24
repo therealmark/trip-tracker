@@ -9,14 +9,12 @@ import com.mongodb.client.ChangeStreamIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.changestream.ChangeStreamDocument;
 import com.mongodb.client.model.changestream.FullDocument;
-import org.bson.conversions.Bson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.Comparator;
-import java.util.List;
 
 @SpringBootApplication
 public class TripTrackerApplication implements CommandLineRunner {
@@ -34,14 +32,13 @@ public class TripTrackerApplication implements CommandLineRunner {
     public void run(String... args) throws Exception {
 
         MongoCollection<Itinerary> itineraries = itineraryService.getItineraryCollection();
-        List<Bson> pipeline = ;
 
-        ChangeStreamIterable<Itinerary> changeStream = itineraries.watch(pipeline).fullDocument(FullDocument.UPDATE_LOOKUP);
+        ChangeStreamIterable<Itinerary> changeStream = itineraries.watch().fullDocument(FullDocument.UPDATE_LOOKUP);
 
         for (ChangeStreamDocument<Itinerary> itineraryChangeStreamDocument : changeStream) {
             Ticket ticket = new Ticket();
             ticket.setPnr(itineraryChangeStreamDocument.getFullDocument().getPassengerNameRecord());
-            Booking latestBooking = itineraryChangeStreamDocument.getFullDocument().getBookings().stream().min(Comparator.comparing(Booking::getBookedOn)).get();
+            Booking latestBooking = itineraryChangeStreamDocument.getFullDocument().getBookings().stream().max(Comparator.comparing(Booking::getBookedOn)).get();
             ticket.setPrice(latestBooking.getPrice());
             ticket.setBookedOnDate(latestBooking.getBookedOn());
             System.out.println(String.format("Updated %s", ticketService.upsertTicket(ticket)));
