@@ -17,24 +17,5 @@ public class Booking {
     private String departingAirport;
     private String arrivingAirport;
     private Integer price;
-
-    public Booking setBookedOn(Date bookedOn) {
-        this.bookedOn = bookedOn;
-        return this;
-    }
-
-    public Booking setDepartingAirport(String departingAirport) {
-        this.departingAirport = departingAirport;
-        return this;
-    }
-
-    public Booking setArrivingAirport(String arrivingAirport) {
-        this.arrivingAirport = arrivingAirport;
-        return this;
-    }
-
-    public Booking setPrice(Integer price) {
-        this.price = price;
-        return this;
-    }
+    private String airline;
 }

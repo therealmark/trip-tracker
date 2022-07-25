@@ -1,49 +1,36 @@
 package com.example.triptracker;
 
-import com.example.triptracker.model.Booking;
-import com.example.triptracker.model.Itinerary;
-import com.example.triptracker.model.Ticket;
-import com.example.triptracker.service.ItineraryService;
+import com.example.triptracker.service.BookingService;
 import com.example.triptracker.service.TicketService;
-import com.mongodb.client.ChangeStreamIterable;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.changestream.ChangeStreamDocument;
-import com.mongodb.client.model.changestream.FullDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.util.Comparator;
+import javax.annotation.PreDestroy;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @SpringBootApplication
 public class TripTrackerApplication implements CommandLineRunner {
-
     @Autowired
-    private ItineraryService itineraryService;
+    private TicketService ticketService;
     @Autowired
-    TicketService ticketService;
+    private BookingService bookingService;
+    private static ExecutorService executorService;
 
     public static void main(String[] args) {
         SpringApplication.run(TripTrackerApplication.class, args);
     }
 
     @Override
-    public void run(String... args) throws Exception {
-
-        MongoCollection<Itinerary> itineraries = itineraryService.getItineraryCollection();
-
-        ChangeStreamIterable<Itinerary> changeStream = itineraries.watch().fullDocument(FullDocument.UPDATE_LOOKUP);
-
-        for (ChangeStreamDocument<Itinerary> itineraryChangeStreamDocument : changeStream) {
-            Ticket ticket = new Ticket();
-            ticket.setPnr(itineraryChangeStreamDocument.getFullDocument().getPassengerNameRecord());
-            Booking oldestBooking = itineraryChangeStreamDocument.getFullDocument().getBookings().stream().min(Comparator.comparing(Booking::getBookedOn)).get();
-            Booking latestBooking = itineraryChangeStreamDocument.getFullDocument().getBookings().stream().max(Comparator.comparing(Booking::getBookedOn)).get();
-            ticket.setOldestPrice(oldestBooking.getPrice());
-            ticket.setLatestPrice(latestBooking.getPrice());
-            ticket.setBookedOnDate(latestBooking.getBookedOn());
-            System.out.println(String.format("Updated %s", ticketService.upsertTicket(ticket)));
-        }
+    public void run(String... args)  {
+        executorService = Executors.newCachedThreadPool();
+        executorService.submit(ticketService);
+        executorService.submit(bookingService);
+    }
+    @PreDestroy
+    public void shutdown() {
+        executorService.shutdown();
     }
 }

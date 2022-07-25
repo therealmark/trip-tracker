@@ -5,8 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 
-import java.util.Date;
-
 /**
  *
  **/
@@ -18,5 +16,6 @@ public class Ticket {
     private String pnr;
     private Integer latestPrice;
     private Integer oldestPrice;
-    private Date bookedOnDate;
+    private Integer savings;
+
 }
