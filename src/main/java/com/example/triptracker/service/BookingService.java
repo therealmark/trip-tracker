@@ -49,11 +49,11 @@ public class BookingService implements Runnable {
 
     @PostConstruct
     public void init() {
-        MongoDatabase db = this.dbClient.getMongoClient().getDatabase("ticket_tracker");
-        db.getCollection("bookings").drop();
-        TimeSeriesOptions timeSeriesOptions = new TimeSeriesOptions("bookedOn");
-        CreateCollectionOptions collectionOptions = new CreateCollectionOptions().timeSeriesOptions(timeSeriesOptions);
-        db.createCollection("bookings", collectionOptions);
+//        MongoDatabase db = this.dbClient.getMongoClient().getDatabase("ticket_tracker");
+//        db.getCollection("bookings").drop();
+//        TimeSeriesOptions timeSeriesOptions = new TimeSeriesOptions("bookedOn");
+//        CreateCollectionOptions collectionOptions = new CreateCollectionOptions().timeSeriesOptions(timeSeriesOptions);
+//        db.createCollection("bookings", collectionOptions);
 
     }
 }

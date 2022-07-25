@@ -56,8 +56,8 @@ public class TicketService implements Runnable {
 
     @PostConstruct
     public void init() {
-        MongoDatabase db = this.dbClient.getMongoClient().getDatabase("ticket_tracker");
-        db.getCollection("tickets").drop();
+//        MongoDatabase db = this.dbClient.getMongoClient().getDatabase("ticket_tracker");
+//        db.getCollection("tickets").drop();
     }
 
     @Override
