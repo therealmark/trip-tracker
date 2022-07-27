@@ -41,13 +41,16 @@ public class TicketService implements Runnable {
             ticket.setOldestPrice(oldestBooking.getPrice());
             ticket.setLatestPrice(latestBooking.getPrice());
             ticket.setSavings(oldestBooking.getPrice() - latestBooking.getPrice());
-            System.out.println(String.format("Updated %s", upsertTicket(ticket)));
+
+            if (ticket.getSavings() > 0) {
+                ticket = upsertTicket(ticket);
+            }
+            System.out.println(String.format("Updated %s", ticket));
         }
     }
 
     private Ticket upsertTicket(Ticket ticket) {
-        MongoCollection<Ticket> tickets = this.dbClient.getMongoClient()
-                .getDatabase("ticket_tracker").getCollection("tickets", Ticket.class);
+        MongoCollection<Ticket> tickets = this.dbClient.getDatabase().getCollection("tickets-sink", Ticket.class);
         Bson filter = Filters.eq("pnr", ticket.getPnr());
         FindOneAndReplaceOptions findOneAndReplaceOptions = new FindOneAndReplaceOptions().upsert(true).returnDocument(ReturnDocument.AFTER);
         return tickets.findOneAndReplace(filter, ticket, findOneAndReplaceOptions);
@@ -56,8 +59,8 @@ public class TicketService implements Runnable {
 
     @PostConstruct
     public void init() {
-//        MongoDatabase db = this.dbClient.getMongoClient().getDatabase("ticket_tracker");
-//        db.getCollection("tickets").drop();
+        this.dbClient.getDatabase().getCollection("tickets-sink").drop();
+        this.dbClient.getDatabase().createCollection("tickets-sink");
     }
 
     @Override

@@ -54,23 +54,6 @@ public class DBClient {
     }
 
     public MongoCollection<Itinerary> getItineraryCollection() {
-        return database.getCollection("itineraries", Itinerary.class);
-    }
-
-    public Itinerary insertItinerary(Itinerary itinerary) {
-        BsonValue insertedId = getItineraryCollection().insertOne(itinerary).getInsertedId();
-        return getItineraryCollection().find(eq("_id", insertedId)).first();
-    }
-
-    public String insertTicket(Itinerary itinerary) {
-        return getTicketCollection().insertOne(itinerary).getInsertedId().asString().getValue();
-    }
-
-    private MongoCollection<Itinerary> getTicketCollection() {
-        return database.getCollection("tickets", Itinerary.class);
-    }
-
-    public Itinerary findItineraryById(String id) {
-        return getItineraryCollection().find(eq(new ObjectId(id))).first();
+        return database.getCollection("itineraries-source", Itinerary.class);
     }
 }
